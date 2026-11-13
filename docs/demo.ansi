@@ -1,0 +1,18 @@
+[2mdeployment/[0m[1mapi[0m  [2mRolloutStuck · ready 2/3 · restarts 7 · age 12d[0m
+  [1;31m✗[0m Rollout is stuck (progressDeadlineSeconds exceeded)
+    [2mReplicaSet "api-7f9c6" has timed out progressing.[0m
+    [32m→[0m New pods never became Ready, see below. Fix them or roll back: `kubectl rollout undo deployment/api`.
+  [1;32m✓[0m 2 pod(s) healthy, not shown
+
+  [2mpod/[0m[1mapi-7f9c6-x2kq9[0m  [2mCrashLoopBackOff · ready 0/1 · restarts 7 · age 1h · node worker-2[0m
+    [1;31m✗[0m [36m[app][0m OOMKilled: went over its memory limit (256Mi)
+      [2m·[0m last exit: OOMKilled, exit code 137, 2m ago
+      [32m→[0m Raise resources.limits.memory, or find what grows: heap size flags (-Xmx, GOMEMLIMIT, Node --max-old-space-size) must fit under the limit.
+      [32m→[0m Watch usage before the next kill: `kubectl top pod api-7f9c6-x2kq9 --containers`.
+
+  [2mpod/[0m[1mapi-7f9c6-pp4mz[0m  [2mImagePullBackOff · ready 0/1 · age 6m · node worker-2[0m
+    [1;31m✗[0m [36m[app][0m Image or tag doesn't exist: ghcr.io/acme/api:1.9.0
+      [2mFailed to pull image "ghcr.io/acme/api:1.9.0": rpc error: code = NotFound desc = failed to pull[0m
+      [2mand unpack image "ghcr.io/acme/api:1.9.0": failed to resolve reference "ghcr.io/acme/api:1.9.0":[0m
+      [2mghcr.io/acme/api:1.9.0: not found[0m
+      [32m→[0m Check the tag was actually pushed (typo, CI didn't publish, or it was built for another architecture).

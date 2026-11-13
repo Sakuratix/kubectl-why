@@ -1,0 +1,49 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "search-0",
+    "namespace": "shop",
+    "creationTimestamp": "2026-11-14T09:46:00Z",
+    "labels": {
+      "app": "search"
+    },
+    "ownerReferences": [
+      {
+        "kind": "ReplicaSet",
+        "name": "search"
+      }
+    ]
+  },
+  "spec": {
+    "containers": [
+      {
+        "name": "search",
+        "image": "opensearchproject/opensearch:2.17.0",
+        "resources": {
+          "limits": {
+            "memory": "8Gi"
+          },
+          "requests": {
+            "memory": "8Gi",
+            "cpu": "4"
+          }
+        }
+      }
+    ]
+  },
+  "status": {
+    "phase": "Pending",
+    "startTime": "2026-11-14T09:46:00Z",
+    "conditions": [
+      {
+        "type": "PodScheduled",
+        "status": "False",
+        "reason": "Unschedulable",
+        "lastTransitionTime": "2026-11-14T09:46:00Z",
+        "message": "0/3 nodes are available: 1 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }, 2 Insufficient cpu. preemption: 0/3 nodes are available: 1 Preemption is not helpful for scheduling, 2 No preemption victims found for incoming pod."
+      }
+    ],
+    "containerStatuses": []
+  }
+}

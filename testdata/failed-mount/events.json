@@ -1,0 +1,42 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "postgres-0.18failedattachvolume",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:52:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "postgres-0",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "FailedAttachVolume",
+      "message": "Multi-Attach error for volume \"pvc-3f1c9a\" Volume is already exclusively attached to one node and can't be attached to another",
+      "count": 1,
+      "firstTimestamp": "2026-11-14T09:47:00Z",
+      "lastTimestamp": "2026-11-14T09:52:00Z"
+    },
+    {
+      "metadata": {
+        "name": "postgres-0.18failedmount",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "postgres-0",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "FailedMount",
+      "message": "Unable to attach or mount volumes: unmounted volumes=[data], unattached volumes=[data kube-api-access-7d2fn]: timed out waiting for the condition",
+      "count": 4,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    }
+  ]
+}

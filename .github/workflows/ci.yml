@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: gofmt
+        run: test -z "$(gofmt -l . | tee /dev/stderr)"
+      - name: vet
+        run: go vet ./...
+      - name: staticcheck
+        run: go run honnef.co/go/tools/cmd/staticcheck@2025.1.1 ./...
+      - name: unit and golden tests
+        run: go test -race -coverprofile=cover.out ./...
+      - name: coverage
+        run: go tool cover -func=cover.out | tail -1 | tee -a "$GITHUB_STEP_SUMMARY"
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go build -o kubectl-why ./cmd/kubectl-why
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: why
+      - name: broken pods are explained correctly
+        run: test/e2e/run.sh
+      - name: works as a kubectl plugin
+        run: |
+          sudo install kubectl-why /usr/local/bin/
+          kubectl plugin list | grep kubectl-why
+          kubectl why pod/healthy -n why-e2e --no-color

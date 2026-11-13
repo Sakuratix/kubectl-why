@@ -1,0 +1,24 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "api-7f9c6-9tq5v.18evicted",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:10:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "api-7f9c6-9tq5v",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "Evicted",
+      "message": "The node was low on resource: memory.",
+      "count": 1,
+      "firstTimestamp": "2026-11-14T09:05:00Z",
+      "lastTimestamp": "2026-11-14T09:10:00Z"
+    }
+  ]
+}

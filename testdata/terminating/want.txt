@@ -1,0 +1,6 @@
+pod/redis-0  Terminating · ready 1/1 · age 6h · node worker-3
+  ✗ Stuck in Terminating for 38m
+    Blocked by finalizers: example.com/backup-guard
+    → A controller is supposed to remove these finalizers. Check that it is running before removing them by hand.
+    → If node worker-3 is NotReady, the kubelet can't confirm the shutdown: `kubectl get node worker-3`.
+    → Last resort: `kubectl delete pod redis-0 --grace-period=0 --force` (the process may still be running on the node).

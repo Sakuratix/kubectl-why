@@ -1,0 +1,24 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "billing-6c9f-k2m4x.18failed",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "billing-6c9f-k2m4x",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "Failed",
+      "message": "Failed to pull image \"registry.acme.internal/billing:3.1\": rpc error: code = Unknown desc = failed to authorize: failed to fetch anonymous token: unexpected status: 401 Unauthorized",
+      "count": 3,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    }
+  ]
+}

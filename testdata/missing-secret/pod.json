@@ -1,0 +1,59 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "api-7f9c6-hh7wq",
+    "namespace": "shop",
+    "creationTimestamp": "2026-11-14T09:56:00Z",
+    "labels": {
+      "app": "api"
+    },
+    "ownerReferences": [
+      {
+        "kind": "ReplicaSet",
+        "name": "api-7f9c6"
+      }
+    ]
+  },
+  "spec": {
+    "nodeName": "worker-2",
+    "containers": [
+      {
+        "name": "app",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "resources": {}
+      }
+    ]
+  },
+  "status": {
+    "phase": "Running",
+    "startTime": "2026-11-14T09:56:00Z",
+    "conditions": [
+      {
+        "type": "PodScheduled",
+        "status": "True",
+        "lastTransitionTime": "2026-11-14T09:56:00Z"
+      },
+      {
+        "type": "Ready",
+        "status": "False",
+        "lastTransitionTime": "2026-11-14T09:56:00Z"
+      }
+    ],
+    "containerStatuses": [
+      {
+        "name": "app",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "ready": false,
+        "restartCount": 0,
+        "state": {
+          "waiting": {
+            "reason": "CreateContainerConfigError",
+            "message": "secret \"api-db-credentials\" not found"
+          }
+        },
+        "lastState": {}
+      }
+    ]
+  }
+}

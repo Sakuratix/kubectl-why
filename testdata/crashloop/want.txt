@@ -1,0 +1,6 @@
+pod/worker-5d8b7-q8vtl  CrashLoopBackOff · ready 0/1 · restarts 12 · age 1h · node worker-2
+  ✗ [worker] CrashLoopBackOff: restarted 12 times
+    Exit code 1: the application exited with an error.
+    · last exit: Error, exit code 1, 2m ago
+    · termination message: panic: dial tcp 10.96.14.2:5432: connect: connection refused
+    → The reason is in the logs of the previous run: `kubectl logs worker-5d8b7-q8vtl -c worker --previous`

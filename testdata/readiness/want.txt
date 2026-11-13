@@ -1,0 +1,6 @@
+pod/web-84d6f-zx7rn  Running · ready 0/1 · age 20m · node worker-2
+  ! [web] Readiness probe failing: no traffic from Services
+    · probe: GET /ready on port 3000, every 10s, 3 failures allowed, initial delay 0s
+    · last failure: Get "http://10.244.2.31:3000/ready": dial tcp 10.244.2.31:3000: connect: connection refused
+    · failed 118 time(s)
+    → Nothing listens on that port: the app listens on another port or only on 127.0.0.1 (it must bind 0.0.0.0).

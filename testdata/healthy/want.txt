@@ -1,0 +1,2 @@
+pod/api-7f9c6-b7c2d  Running · ready 1/1 · age 1h · node worker-2
+  ✓ Healthy: all containers are running and Ready

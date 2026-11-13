@@ -1,0 +1,24 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "web-84d6f-zx7rn.18unhealthy",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "web-84d6f-zx7rn",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "Unhealthy",
+      "message": "Readiness probe failed: Get \"http://10.244.2.31:3000/ready\": dial tcp 10.244.2.31:3000: connect: connection refused",
+      "count": 118,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "api-7f9c6-m3k8j.18backoff",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "api-7f9c6-m3k8j",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "BackOff",
+      "message": "Back-off restarting failed container migrate",
+      "count": 21,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    }
+  ]
+}

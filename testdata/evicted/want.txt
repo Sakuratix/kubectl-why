@@ -1,0 +1,7 @@
+pod/api-7f9c6-9tq5v  Evicted · ready 0/1 · age 3h · node worker-1
+  ✗ Evicted by the kubelet
+    The node was low on resource: memory. Threshold quantity: 100Mi, available: 64Mi. Container app
+    was using 1.2Gi, request is 0, has larger consumption of memory.
+    → The node ran low on a resource (usually memory or ephemeral disk) and picked this pod to free it.
+    → Set memory requests close to real usage so the pod is not the first candidate, and check `kubectl describe node worker-1` for pressure conditions.
+    → Evicted pods are not cleaned up automatically: `kubectl delete pod api-7f9c6-9tq5v` once you have read this.

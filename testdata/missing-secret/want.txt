@@ -1,0 +1,4 @@
+pod/api-7f9c6-hh7wq  CreateContainerConfigError · ready 0/1 · age 4m · node worker-2
+  ✗ [app] Missing secret "api-db-credentials"
+    secret "api-db-credentials" not found
+    → Create it in namespace shop, or fix the name it is referenced by: `kubectl get secret -n shop`.

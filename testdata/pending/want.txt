@@ -1,0 +1,7 @@
+pod/search-0  Pending · ready 0/1 · age 14m
+  ✗ Can't be scheduled on any node
+    0/3 nodes are available
+    · 1 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }
+    · 2 Insufficient cpu
+    → Some nodes are tainted. Add a matching toleration or schedule elsewhere: `kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints`.
+    → No node has enough free cpu for the requests (search=4). Lower them, free capacity, or add nodes.

@@ -1,0 +1,7 @@
+pod/api-7f9c6-l9d2s  CrashLoopBackOff · ready 0/1 · restarts 4 · age 1h · node worker-2
+  ✗ [app] Killed by its liveness probe
+    · last exit: Error, exit code 137, 2m ago
+    · probe: GET /healthz on port 8080, every 5s, 3 failures allowed, initial delay 5s
+    · last failure: Get "http://10.244.1.17:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+    → The app starts but doesn't answer the probe in time. If startup is slow, add a startupProbe instead of a longer initialDelaySeconds.
+    → Make sure the probe hits a cheap endpoint that doesn't depend on databases or other services.

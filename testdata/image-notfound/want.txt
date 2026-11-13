@@ -1,0 +1,6 @@
+pod/api-7f9c6-pp4mz  ImagePullBackOff · ready 0/1 · age 6m · node worker-2
+  ✗ [app] Image or tag doesn't exist: ghcr.io/acme/api:1.9.0
+    Failed to pull image "ghcr.io/acme/api:1.9.0": rpc error: code = NotFound desc = failed to pull
+    and unpack image "ghcr.io/acme/api:1.9.0": failed to resolve reference "ghcr.io/acme/api:1.9.0":
+    ghcr.io/acme/api:1.9.0: not found
+    → Check the tag was actually pushed (typo, CI didn't publish, or it was built for another architecture).

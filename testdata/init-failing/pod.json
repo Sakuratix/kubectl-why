@@ -1,0 +1,87 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "api-7f9c6-m3k8j",
+    "namespace": "shop",
+    "creationTimestamp": "2026-11-14T09:48:00Z",
+    "labels": {
+      "app": "api"
+    },
+    "ownerReferences": [
+      {
+        "kind": "ReplicaSet",
+        "name": "api-7f9c6"
+      }
+    ]
+  },
+  "spec": {
+    "nodeName": "worker-2",
+    "containers": [
+      {
+        "name": "app",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "resources": {}
+      }
+    ],
+    "initContainers": [
+      {
+        "name": "migrate",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "resources": {}
+      }
+    ]
+  },
+  "status": {
+    "phase": "Pending",
+    "startTime": "2026-11-14T09:48:00Z",
+    "conditions": [
+      {
+        "type": "PodScheduled",
+        "status": "True",
+        "lastTransitionTime": "2026-11-14T09:48:00Z"
+      },
+      {
+        "type": "Ready",
+        "status": "False",
+        "lastTransitionTime": "2026-11-14T09:48:00Z"
+      }
+    ],
+    "containerStatuses": [
+      {
+        "name": "app",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "ready": false,
+        "restartCount": 0,
+        "state": {
+          "waiting": {
+            "reason": "PodInitializing"
+          }
+        },
+        "lastState": {}
+      }
+    ],
+    "initContainerStatuses": [
+      {
+        "name": "migrate",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "ready": false,
+        "restartCount": 5,
+        "state": {
+          "waiting": {
+            "reason": "CrashLoopBackOff"
+          }
+        },
+        "lastState": {
+          "terminated": {
+            "exitCode": 1,
+            "reason": "Error",
+            "startedAt": "2026-11-14T09:56:00Z",
+            "finishedAt": "2026-11-14T09:58:00Z",
+            "message": "migration 0042_add_index failed: relation \"orders\" does not exist"
+          }
+        }
+      }
+    ]
+  }
+}

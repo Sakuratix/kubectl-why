@@ -1,0 +1,60 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "api-7f9c6-l9d2s.18unhealthy",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:57:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "api-7f9c6-l9d2s",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "Unhealthy",
+      "message": "Liveness probe failed: Get \"http://10.244.1.17:8080/healthz\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)",
+      "count": 12,
+      "firstTimestamp": "2026-11-14T09:52:00Z",
+      "lastTimestamp": "2026-11-14T09:57:00Z"
+    },
+    {
+      "metadata": {
+        "name": "api-7f9c6-l9d2s.18killing",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:57:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "api-7f9c6-l9d2s",
+        "namespace": "shop"
+      },
+      "type": "Normal",
+      "reason": "Killing",
+      "message": "Container app failed liveness probe, will be restarted",
+      "count": 4,
+      "firstTimestamp": "2026-11-14T09:52:00Z",
+      "lastTimestamp": "2026-11-14T09:57:00Z"
+    },
+    {
+      "metadata": {
+        "name": "api-7f9c6-l9d2s.18backoff",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "api-7f9c6-l9d2s",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "BackOff",
+      "message": "Back-off restarting failed container app",
+      "count": 9,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    }
+  ]
+}

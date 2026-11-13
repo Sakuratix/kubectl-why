@@ -1,0 +1,5 @@
+pod/api-7f9c6-x2kq9  CrashLoopBackOff · ready 0/1 · restarts 7 · age 1h · node worker-2
+  ✗ [app] OOMKilled: went over its memory limit (256Mi)
+    · last exit: OOMKilled, exit code 137, 2m ago
+    → Raise resources.limits.memory, or find what grows: heap size flags (-Xmx, GOMEMLIMIT, Node --max-old-space-size) must fit under the limit.
+    → Watch usage before the next kill: `kubectl top pod api-7f9c6-x2kq9 --containers`.

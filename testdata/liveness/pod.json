@@ -1,0 +1,74 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "api-7f9c6-l9d2s",
+    "namespace": "shop",
+    "creationTimestamp": "2026-11-14T08:25:00Z",
+    "labels": {
+      "app": "api"
+    },
+    "ownerReferences": [
+      {
+        "kind": "ReplicaSet",
+        "name": "api-7f9c6"
+      }
+    ]
+  },
+  "spec": {
+    "nodeName": "worker-2",
+    "containers": [
+      {
+        "name": "app",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "resources": {},
+        "livenessProbe": {
+          "httpGet": {
+            "path": "/healthz",
+            "port": 8080
+          },
+          "initialDelaySeconds": 5,
+          "periodSeconds": 5,
+          "failureThreshold": 3
+        }
+      }
+    ]
+  },
+  "status": {
+    "phase": "Running",
+    "startTime": "2026-11-14T08:25:00Z",
+    "conditions": [
+      {
+        "type": "PodScheduled",
+        "status": "True",
+        "lastTransitionTime": "2026-11-14T08:25:00Z"
+      },
+      {
+        "type": "Ready",
+        "status": "False",
+        "lastTransitionTime": "2026-11-14T08:25:00Z"
+      }
+    ],
+    "containerStatuses": [
+      {
+        "name": "app",
+        "image": "ghcr.io/acme/api:1.8.2",
+        "ready": false,
+        "restartCount": 4,
+        "state": {
+          "waiting": {
+            "reason": "CrashLoopBackOff"
+          }
+        },
+        "lastState": {
+          "terminated": {
+            "exitCode": 137,
+            "reason": "Error",
+            "startedAt": "2026-11-14T09:56:00Z",
+            "finishedAt": "2026-11-14T09:58:00Z"
+          }
+        }
+      }
+    ]
+  }
+}

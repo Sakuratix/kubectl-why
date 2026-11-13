@@ -1,0 +1,5 @@
+pod/billing-6c9f-k2m4x  ErrImagePull · ready 0/1 · age 3m · node worker-2
+  ✗ [billing] Registry refused access to registry.acme.internal/billing:3.1
+    Failed to pull image "registry.acme.internal/billing:3.1": rpc error: code = Unknown desc =
+    failed to authorize: failed to fetch anonymous token: unexpected status: 401 Unauthorized
+    → The registry is private. Add imagePullSecrets to the pod or its ServiceAccount, and check the secret is in namespace shop.
