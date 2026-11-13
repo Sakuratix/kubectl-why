@@ -1,5 +1,5 @@
 pod/api-7f9c6-m3k8j  Init:CrashLoopBackOff · ready 0/1 · age 12m · node worker-2
-  ✗ [init:migrate] CrashLoopBackOff: restarted 5 times
+  ✗ [init:migrate] Crash loop: restarted 5 times
     Exit code 1: the application exited with an error.
     · last exit: Error, exit code 1, 2m ago
     · termination message: migration 0042_add_index failed: relation "orders" does not exist

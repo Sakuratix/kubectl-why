@@ -55,6 +55,42 @@
       "count": 20,
       "firstTimestamp": "2026-11-14T09:54:00Z",
       "lastTimestamp": "2026-11-14T09:59:00Z"
+    },
+    {
+      "metadata": {
+        "name": "api-7f9c6-pp4mz.18failed",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "api-7f9c6-pp4mz",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "Failed",
+      "message": "Error: ErrImagePull",
+      "count": 4,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    },
+    {
+      "metadata": {
+        "name": "api-7f9c6-pp4mz.18failed",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T10:00:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "api-7f9c6-pp4mz",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "Failed",
+      "message": "Error: ImagePullBackOff",
+      "count": 20,
+      "firstTimestamp": "2026-11-14T09:55:00Z",
+      "lastTimestamp": "2026-11-14T10:00:00Z"
     }
   ]
 }

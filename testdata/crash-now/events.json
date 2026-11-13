@@ -1,0 +1,24 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "report-6b4d9-7wq2c.18backoff",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "report-6b4d9-7wq2c",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "BackOff",
+      "message": "Back-off restarting failed container report",
+      "count": 3,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    }
+  ]
+}

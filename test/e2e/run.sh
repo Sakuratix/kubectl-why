@@ -40,7 +40,7 @@ check() { # target expected-exit pattern...
 }
 
 check pod/oom      1 "OOMKilled: went over its memory limit (64Mi)"
-check pod/crash    1 "CrashLoopBackOff" "exit code 3" "termination message: connect: connection refused"
+check pod/crash    1 "Crash loop" "exit code 3" "termination message: connect: connection refused"
 check pod/badimage 1 "Image or tag doesn't exist" "this-tag-does-not-exist"
 check pod/nosecret 1 'Missing secret "db-credentials"'
 check pod/notready 1 "Readiness probe failing" "TCP port 8080" "Nothing listens on that port"

@@ -1,0 +1,5 @@
+pod/report-6b4d9-7wq2c  Error · ready 0/1 · restarts 2 · age 1h · node worker-2
+  ✗ [report] Crash loop: restarted 2 times
+    · last exit: Error, exit code 3, 0s ago
+    · termination message: connect: connection refused
+    → The reason is in the logs of the previous run: `kubectl logs report-6b4d9-7wq2c -c report --previous`

@@ -169,6 +169,9 @@ func (d *podDiag) terminating() {
 
 var clauseRe = regexp.MustCompile(`^\s*(\d+)\s+(.+?)\.?\s*$`)
 
+// scheduler clauses are separated by ", " or ". " (keys like node-role.kubernetes.io contain dots)
+var clauseSep = regexp.MustCompile(`[.,]\s+`)
+
 func (d *podDiag) unschedulable(c kube.Condition) {
 	msg := c.Message
 	if msg == "" {
@@ -181,10 +184,10 @@ func (d *podDiag) unschedulable(c kube.Condition) {
 	head, rest, ok := strings.Cut(msg, ": ")
 	if ok && strings.Contains(head, "nodes are available") {
 		f.Detail = strings.TrimSuffix(head, ":")
-		rest, _, _ = strings.Cut(rest, " preemption:")
-		for _, cl := range strings.Split(rest, ", ") {
-			cl = strings.TrimSpace(strings.TrimSuffix(cl, "."))
-			if cl == "" {
+		rest, _, _ = strings.Cut(rest, "preemption:")
+		for _, cl := range clauseSep.Split(rest, -1) {
+			cl = strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(cl), "."))
+			if cl == "" || strings.Contains(cl, "no new claims to deallocate") {
 				continue
 			}
 			f.Evidence = append(f.Evidence, cl)
@@ -297,9 +300,15 @@ func (d *podDiag) container(cs kube.ContainerStatus, init bool) {
 			}
 		}
 	}
-	if t := cs.State.Terminated; t != nil && init && t.ExitCode != 0 {
-		d.crash(cs, label, spec, false)
-		return
+	if t := cs.State.Terminated; t != nil {
+		if init && t.ExitCode != 0 {
+			d.crash(cs, label, spec, false)
+			return
+		}
+		if !init && d.p.Status.Phase != "Succeeded" && (t.ExitCode != 0 || cs.RestartCount > 0) {
+			d.crash(cs, label, spec, true)
+			return
+		}
 	}
 	if init {
 		if cs.State.Running != nil {
@@ -315,7 +324,7 @@ func (d *podDiag) container(cs kube.ContainerStatus, init bool) {
 		d.notReady(cs, label, spec)
 		return
 	}
-	if cs.RestartCount > 0 && cs.LastState.Terminated != nil {
+	if cs.State.Running != nil && cs.RestartCount > 0 && cs.LastState.Terminated != nil {
 		t := cs.LastState.Terminated
 		f := Finding{
 			Severity:  Info,
@@ -346,7 +355,7 @@ func (d *podDiag) spec(name string, init bool) kube.Container {
 
 func (d *podDiag) imagePull(cs kube.ContainerStatus, label, msg string) {
 	d.markUsed("Failed", "BackOff", "ErrImagePull", "ImagePullBackOff")
-	if e := d.lastEventMatching("Failed", "pull"); e != nil {
+	if e := d.lastEventMatching("Failed", "Failed to pull image"); e != nil {
 		msg = e.Message
 	}
 	f := Finding{
@@ -391,14 +400,14 @@ func (d *podDiag) configError(label, reason, msg string) {
 }
 
 func (d *podDiag) crash(cs kube.ContainerStatus, label string, spec kube.Container, looping bool) {
-	t := cs.LastState.Terminated
+	t := cs.State.Terminated // crashed just now
 	if t == nil {
-		t = cs.State.Terminated
+		t = cs.LastState.Terminated
 	}
 	d.markUsed("BackOff")
 	f := Finding{Severity: Crit, Container: label}
 	if looping {
-		f.Title = fmt.Sprintf("CrashLoopBackOff: restarted %d times", cs.RestartCount)
+		f.Title = fmt.Sprintf("Crash loop: restarted %d times", cs.RestartCount)
 	} else {
 		f.Title = "Init container failed"
 	}

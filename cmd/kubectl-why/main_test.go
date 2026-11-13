@@ -54,6 +54,7 @@ func TestGolden(t *testing.T) {
 	}{
 		{"oomkilled", []string{"pod/api-7f9c6-x2kq9", "-n", "shop"}, 1},
 		{"crashloop", []string{"worker-5d8b7-q8vtl"}, 1},
+		{"crash-now", []string{"pod/report-6b4d9-7wq2c"}, 1},
 		{"liveness", []string{"pod", "api-7f9c6-l9d2s"}, 1},
 		{"image-notfound", []string{"pod/api-7f9c6-pp4mz"}, 1},
 		{"image-unauthorized", []string{"pod/billing-6c9f-k2m4x"}, 1},
