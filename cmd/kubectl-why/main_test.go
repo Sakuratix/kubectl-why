@@ -51,33 +51,38 @@ func TestGolden(t *testing.T) {
 		dir  string
 		args []string
 		code int
+		want string // golden file, want.txt when empty
 	}{
-		{"oomkilled", []string{"pod/api-7f9c6-x2kq9", "-n", "shop"}, 1},
-		{"crashloop", []string{"worker-5d8b7-q8vtl"}, 1},
-		{"crash-now", []string{"pod/report-6b4d9-7wq2c"}, 1},
-		{"liveness", []string{"pod", "api-7f9c6-l9d2s"}, 1},
-		{"image-notfound", []string{"pod/api-7f9c6-pp4mz"}, 1},
-		{"image-unauthorized", []string{"pod/billing-6c9f-k2m4x"}, 1},
-		{"pending", []string{"pod/search-0"}, 1},
-		{"missing-secret", []string{"pod/api-7f9c6-hh7wq"}, 1},
-		{"readiness", []string{"pod/web-84d6f-zx7rn"}, 1},
-		{"healthy", []string{"pod/api-7f9c6-b7c2d"}, 0},
-		{"terminating", []string{"pod/redis-0"}, 1},
-		{"evicted", []string{"pod/api-7f9c6-9tq5v"}, 1},
-		{"failed-mount", []string{"pod/postgres-0"}, 1},
-		{"init-failing", []string{"pod/api-7f9c6-m3k8j"}, 1},
-		{"deployment", []string{"deploy/api", "-n", "shop"}, 1},
-		{"namespace", []string{"-n", "shop"}, 1},
+		{"oomkilled", []string{"pod/api-7f9c6-x2kq9", "-n", "shop"}, 1, ""},
+		{"crashloop", []string{"worker-5d8b7-q8vtl"}, 1, ""},
+		{"crash-now", []string{"pod/report-6b4d9-7wq2c"}, 1, ""},
+		{"liveness", []string{"pod", "api-7f9c6-l9d2s"}, 1, ""},
+		{"image-notfound", []string{"pod/api-7f9c6-pp4mz"}, 1, ""},
+		{"image-unauthorized", []string{"pod/billing-6c9f-k2m4x"}, 1, ""},
+		{"pending", []string{"pod/search-0"}, 1, ""},
+		{"missing-secret", []string{"pod/api-7f9c6-hh7wq"}, 1, ""},
+		{"readiness", []string{"pod/web-84d6f-zx7rn"}, 1, ""},
+		{"healthy", []string{"pod/api-7f9c6-b7c2d"}, 0, ""},
+		{"terminating", []string{"pod/redis-0"}, 1, ""},
+		{"evicted", []string{"pod/api-7f9c6-9tq5v"}, 1, ""},
+		{"failed-mount", []string{"pod/postgres-0"}, 1, ""},
+		{"init-failing", []string{"pod/api-7f9c6-m3k8j"}, 1, ""},
+		{"deployment", []string{"deploy/api", "-n", "shop"}, 1, ""},
+		{"namespace", []string{"-n", "shop"}, 1, ""},
+		{"all-namespaces", []string{"-A"}, 1, ""},
 	}
 	for _, c := range cases {
-		t.Run(c.dir, func(t *testing.T) {
+		if c.want == "" {
+			c.want = "want.txt"
+		}
+		t.Run(c.dir+"/"+c.want, func(t *testing.T) {
 			dir := filepath.Join("..", "..", "testdata", c.dir)
 			var out, errb bytes.Buffer
 			code := run(append(c.args, "--no-color"), &out, &errb, &fixtureRunner{dir: dir})
 			if code != c.code {
 				t.Fatalf("exit code %d, want %d; stderr: %s", code, c.code, errb.String())
 			}
-			golden := filepath.Join(dir, "want.txt")
+			golden := filepath.Join(dir, c.want)
 			if *update {
 				if err := os.WriteFile(golden, out.Bytes(), 0o644); err != nil {
 					t.Fatal(err)
@@ -121,6 +126,8 @@ func TestParse(t *testing.T) {
 		{[]string{"x", "y"}, "", []string{"x", "y"}, false},
 		{[]string{"-o", "yaml"}, "", nil, true},
 		{[]string{"--bogus"}, "", nil, true},
+		{[]string{"-A", "pod/x"}, "", nil, true},
+		{[]string{"--all-namespaces"}, "", nil, false},
 		{[]string{"-n"}, "", nil, true},
 	}
 	for _, c := range cases {
@@ -162,4 +169,14 @@ func TestDemo(t *testing.T) {
 	}
 	defer f.Close()
 	run([]string{"deploy/api", "-n", "shop"}, f, &bytes.Buffer{}, &fixtureRunner{dir: "../../testdata/deployment"})
+}
+
+func TestAllNamespacesAsksKubectlForEverything(t *testing.T) {
+	f := &fixtureRunner{dir: "../../testdata/all-namespaces"}
+	run([]string{"-A", "--no-color"}, &bytes.Buffer{}, &bytes.Buffer{}, f)
+	for _, c := range f.calls {
+		if !strings.Contains(c, "--all-namespaces") {
+			t.Errorf("kubectl %s: missing --all-namespaces", c)
+		}
+	}
 }

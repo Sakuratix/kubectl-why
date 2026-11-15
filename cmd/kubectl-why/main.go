@@ -3,6 +3,7 @@
 //	kubectl why pod/api-7f9c6
 //	kubectl why deploy/api -n prod
 //	kubectl why                # every unhealthy pod in the namespace
+//	kubectl why -A             # ... in every namespace
 package main
 
 import (
@@ -36,6 +37,7 @@ Targets:
 
 Flags:
   -n, --namespace NS       namespace (default: from kubeconfig)
+  -A, --all-namespaces     scan every namespace (only without targets)
       --context NAME       kubeconfig context
       --kubeconfig FILE    kubeconfig file
   -o, --output text|json   output format (default text)
@@ -47,7 +49,7 @@ Exit codes: 0 healthy, 1 problems found, 2 error.
 
 type opts struct {
 	ns, ctx, kubeconfig, output string
-	noColor                     bool
+	noColor, all                bool
 	targets                     []string
 }
 
@@ -82,19 +84,20 @@ func run(args []string, stdout, stderr io.Writer, r kube.Runner) int {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	c := kube.Client{R: r, Namespace: o.ns}
+	c := kube.Client{R: r, Namespace: o.ns, AllNamespaces: o.all}
 	reports, err := collect(ctx, c, o.targets, now())
 	if err != nil {
 		fmt.Fprintln(stderr, "error:", err)
 		return 2
 	}
-	if o.output == "json" {
+	switch o.output {
+	case "json":
 		if err := render.JSON(stdout, reports); err != nil {
 			fmt.Fprintln(stderr, "error:", err)
 			return 2
 		}
-	} else {
-		render.Text(stdout, render.Style{Color: !o.noColor && colorOK(stdout)}, reports)
+	default:
+		render.Text(stdout, render.Style{Color: !o.noColor && colorOK(stdout), Namespaces: o.all}, reports)
 	}
 	for _, rep := range reports {
 		if rep.Worst() >= diagnose.Warn {
@@ -139,6 +142,8 @@ func parse(args []string) (opts, error) {
 			o.kubeconfig, err = val()
 		case "-o", "--output":
 			o.output, err = val()
+		case "-A", "--all-namespaces":
+			o.all = true
 		case "--no-color":
 			o.noColor = true
 		default:
@@ -151,8 +156,13 @@ func parse(args []string) (opts, error) {
 			return o, err
 		}
 	}
-	if o.output != "text" && o.output != "json" {
+	switch o.output {
+	case "text", "json":
+	default:
 		return o, fmt.Errorf("--output must be text or json, got %q", o.output)
+	}
+	if o.all && len(o.targets) > 0 {
+		return o, errors.New("--all-namespaces scans the whole cluster; drop the targets or use -n")
 	}
 	// "kubectl why deploy api" -> deploy/api
 	if len(o.targets) == 2 && !strings.Contains(o.targets[0], "/") && kindOf(o.targets[0]) != "" {
@@ -210,7 +220,7 @@ func collect(ctx context.Context, c kube.Client, targets []string, now time.Time
 			}
 			var prs []diagnose.Report
 			for _, p := range pods {
-				prs = append(prs, diagnose.Pod(p, events["Pod/"+p.Metadata.Name], now))
+				prs = append(prs, diagnose.Pod(p, events[kube.EventKey(p.Metadata.Namespace, "Pod", p.Metadata.Name)], now))
 			}
 			out = append(out, diagnose.Deployment(d, prs, now))
 		}
@@ -229,20 +239,28 @@ func namespaceScan(ctx context.Context, c kube.Client, now time.Time) ([]diagnos
 	}
 	var out []diagnose.Report
 	for _, p := range pods {
-		r := diagnose.Pod(p, events["Pod/"+p.Metadata.Name], now)
+		r := diagnose.Pod(p, events[kube.EventKey(p.Metadata.Namespace, "Pod", p.Metadata.Name)], now)
 		if r.Worst() >= diagnose.Warn || (r.Worst() == diagnose.Info && r.Restarts > 0) {
 			out = append(out, r)
 		}
 	}
 	if len(out) == 0 {
-		ns := c.Namespace
-		if ns == "" {
-			ns = "current namespace"
+		kind, name, title := "Namespace", c.Namespace, fmt.Sprintf("All %d pods are healthy", len(pods))
+		if name == "" {
+			name = "current namespace"
+		}
+		if c.AllNamespaces {
+			nss := map[string]bool{}
+			for _, p := range pods {
+				nss[p.Metadata.Namespace] = true
+			}
+			kind, name = "Cluster", "all namespaces"
+			title = fmt.Sprintf("All %d pods in %d namespaces are healthy", len(pods), len(nss))
 		}
 		out = append(out, diagnose.Report{
-			Kind: "Namespace", Name: ns, Status: "Healthy",
+			Kind: kind, Name: name, Status: "Healthy",
 			Ready: fmt.Sprintf("%d pods", len(pods)), Age: "-",
-			Findings: []diagnose.Finding{{Severity: diagnose.OK, Title: fmt.Sprintf("All %d pods are healthy", len(pods))}},
+			Findings: []diagnose.Finding{{Severity: diagnose.OK, Title: title}},
 		})
 	}
 	return out, nil

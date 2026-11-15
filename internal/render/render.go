@@ -12,6 +12,8 @@ import (
 
 type Style struct {
 	Color bool
+	// Namespaces prefixes each object with its namespace (cluster-wide scans).
+	Namespaces bool
 }
 
 func (s Style) c(code, text string) string {
@@ -50,6 +52,9 @@ func Text(w io.Writer, st Style, reports []diagnose.Report) {
 
 func text(w io.Writer, st Style, r diagnose.Report, pad string) {
 	head := pad + st.dim(strings.ToLower(r.Kind)+"/") + st.bold(r.Name)
+	if st.Namespaces && r.Namespace != "" {
+		head = pad + st.dim(r.Namespace+" › "+strings.ToLower(r.Kind)+"/") + st.bold(r.Name)
+	}
 	meta := []string{r.Status, "ready " + r.Ready}
 	if r.Restarts > 0 {
 		meta = append(meta, fmt.Sprintf("restarts %d", r.Restarts))

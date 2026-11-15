@@ -49,9 +49,14 @@ func (k Kubectl) Run(ctx context.Context, args ...string) ([]byte, error) {
 type Client struct {
 	R         Runner
 	Namespace string
+	// AllNamespaces lists pods and events across the cluster (kubectl -A).
+	AllNamespaces bool
 }
 
 func (c Client) nsArgs() []string {
+	if c.AllNamespaces {
+		return []string{"--all-namespaces"}
+	}
 	if c.Namespace == "" {
 		return nil
 	}
@@ -105,7 +110,13 @@ func (c Client) EventsFor(ctx context.Context, kind, name string) ([]Event, erro
 	return l.Items, nil
 }
 
-// Events returns all events in the namespace grouped by "Kind/name", oldest first.
+// EventKey is how Events groups events: by namespace, kind and name, so pods
+// with the same name in different namespaces never share events.
+func EventKey(namespace, kind, name string) string {
+	return namespace + "/" + kind + "/" + name
+}
+
+// Events returns all events in scope grouped by EventKey, oldest first.
 func (c Client) Events(ctx context.Context) (map[string][]Event, error) {
 	var l List[Event]
 	if err := c.get(ctx, &l, "events"); err != nil {
@@ -114,7 +125,11 @@ func (c Client) Events(ctx context.Context) (map[string][]Event, error) {
 	sort.SliceStable(l.Items, func(i, j int) bool { return l.Items[i].When().Before(l.Items[j].When()) })
 	out := map[string][]Event{}
 	for _, e := range l.Items {
-		k := e.InvolvedObject.Kind + "/" + e.InvolvedObject.Name
+		ns := e.InvolvedObject.Namespace
+		if ns == "" {
+			ns = e.Metadata.Namespace
+		}
+		k := EventKey(ns, e.InvolvedObject.Kind, e.InvolvedObject.Name)
 		out[k] = append(out[k], e)
 	}
 	return out, nil

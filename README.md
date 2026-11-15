@@ -34,6 +34,7 @@ Or from source: `go install github.com/Sakuratix/kubectl-why/cmd/kubectl-why@lat
 kubectl why pod/api-7f9c6-x2kq9      # one pod
 kubectl why deploy/api -n prod       # a deployment: rollout state + its broken pods
 kubectl why -n prod                  # every unhealthy pod in the namespace
+kubectl why -A                       # ... in every namespace
 kubectl why deploy/api -o json       # for scripts and bots
 ```
 
