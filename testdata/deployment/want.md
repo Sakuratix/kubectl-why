@@ -1,0 +1,37 @@
+> **kubectl why** · 3 critical
+
+### 🔴 deployment/api in `shop`
+
+**RolloutStuck** · ready 2/3 · restarts 7 · age 12d
+
+🔴 **Rollout is stuck (progressDeadlineSeconds exceeded)**
+
+ReplicaSet "api-7f9c6" has timed out progressing.
+
+Next steps:
+- [ ] New pods never became Ready, see below. Fix them or roll back: `kubectl rollout undo deployment/api`.
+
+🟢 **2 pod(s) healthy, not shown**
+
+#### 🔴 pod/api-7f9c6-x2kq9 in `shop`
+
+**CrashLoopBackOff** · ready 0/1 · restarts 7 · age 1h · node `worker-2`
+
+🔴 **`app` OOMKilled: went over its memory limit (256Mi)**
+
+- last exit: OOMKilled, exit code 137, 2m ago
+
+Next steps:
+- [ ] Raise resources.limits.memory, or find what grows: heap size flags (-Xmx, GOMEMLIMIT, Node --max-old-space-size) must fit under the limit.
+- [ ] Watch usage before the next kill: `kubectl top pod api-7f9c6-x2kq9 --containers`.
+
+#### 🔴 pod/api-7f9c6-pp4mz in `shop`
+
+**ImagePullBackOff** · ready 0/1 · age 6m · node `worker-2`
+
+🔴 **`app` Image or tag doesn't exist: ghcr.io/acme/api:1.9.0**
+
+Failed to pull image "ghcr.io/acme/api:1.9.0": rpc error: code = NotFound desc = failed to pull and unpack image "ghcr.io/acme/api:1.9.0": failed to resolve reference "ghcr.io/acme/api:1.9.0": ghcr.io/acme/api:1.9.0: not found
+
+Next steps:
+- [ ] Check the tag was actually pushed (typo, CI didn't publish, or it was built for another architecture).

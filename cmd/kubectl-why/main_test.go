@@ -70,6 +70,8 @@ func TestGolden(t *testing.T) {
 		{"deployment", []string{"deploy/api", "-n", "shop"}, 1, ""},
 		{"namespace", []string{"-n", "shop"}, 1, ""},
 		{"all-namespaces", []string{"-A"}, 1, ""},
+		{"deployment", []string{"deploy/api", "-n", "shop", "-o", "markdown"}, 1, "want.md"},
+		{"oomkilled", []string{"pod/api-7f9c6-x2kq9", "-o", "md"}, 1, "want.md"},
 	}
 	for _, c := range cases {
 		if c.want == "" {
@@ -127,7 +129,7 @@ func TestParse(t *testing.T) {
 		{[]string{"-o", "yaml"}, "", nil, true},
 		{[]string{"--bogus"}, "", nil, true},
 		{[]string{"-A", "pod/x"}, "", nil, true},
-		{[]string{"--all-namespaces"}, "", nil, false},
+		{[]string{"-o", "md", "--all-namespaces"}, "", nil, false},
 		{[]string{"-n"}, "", nil, true},
 	}
 	for _, c := range cases {

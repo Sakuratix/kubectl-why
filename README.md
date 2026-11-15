@@ -36,6 +36,7 @@ kubectl why deploy/api -n prod       # a deployment: rollout state + its broken 
 kubectl why -n prod                  # every unhealthy pod in the namespace
 kubectl why -A                       # ... in every namespace
 kubectl why deploy/api -o json       # for scripts and bots
+kubectl why deploy/api -o markdown   # for tickets and PR comments
 ```
 
 Exit code is `0` when everything is healthy, `1` when it found problems, `2` on errors, so it also works as a post-deploy check in CI:
@@ -43,6 +44,18 @@ Exit code is `0` when everything is healthy, `1` when it found problems, `2` on 
 ```sh
 helm upgrade --install api ./chart --wait --timeout 3m || kubectl why deploy/api -n prod
 ```
+
+### Reports for tickets and pull requests
+
+`-o markdown` turns the same diagnosis into GitHub-flavoured Markdown: severity icons, evidence as a list, and the hints as a task list someone can tick off. Paste it into the incident ticket, or let CI post it when a deploy fails:
+
+```yaml
+- name: explain a failed rollout
+  if: failure()
+  run: kubectl why deploy/api -n prod -o markdown >> "$GITHUB_STEP_SUMMARY"
+```
+
+Event and termination messages are escaped, so a crashing app can't inject HTML into your tracker. This repo's own CI does exactly this against a kind cluster full of broken pods; open any [ci run](https://github.com/Sakuratix/kubectl-why/actions/workflows/ci.yml) to see the result.
 
 ## What it recognises
 

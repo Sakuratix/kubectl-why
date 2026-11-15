@@ -46,3 +46,7 @@ jobs:
           sudo install kubectl-why /usr/local/bin/
           kubectl plugin list | grep kubectl-why
           kubectl why pod/healthy -n why-e2e --no-color
+      - name: cluster-wide report in the job summary
+        run: |
+          # the e2e namespace is full of broken pods on purpose, so exit 1 is expected
+          kubectl why -A -o markdown >> "$GITHUB_STEP_SUMMARY" || test $? -eq 1

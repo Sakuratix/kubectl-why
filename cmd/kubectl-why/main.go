@@ -40,7 +40,7 @@ Flags:
   -A, --all-namespaces     scan every namespace (only without targets)
       --context NAME       kubeconfig context
       --kubeconfig FILE    kubeconfig file
-  -o, --output text|json   output format (default text)
+  -o, --output FORMAT      text (default), json, or markdown for tickets and PR comments
       --no-color           disable colors (also NO_COLOR=1; CLICOLOR_FORCE=1 forces them)
   -v, --version            print version
 
@@ -96,6 +96,8 @@ func run(args []string, stdout, stderr io.Writer, r kube.Runner) int {
 			fmt.Fprintln(stderr, "error:", err)
 			return 2
 		}
+	case "markdown", "md":
+		render.Markdown(stdout, reports)
 	default:
 		render.Text(stdout, render.Style{Color: !o.noColor && colorOK(stdout), Namespaces: o.all}, reports)
 	}
@@ -157,9 +159,9 @@ func parse(args []string) (opts, error) {
 		}
 	}
 	switch o.output {
-	case "text", "json":
+	case "text", "json", "markdown", "md":
 	default:
-		return o, fmt.Errorf("--output must be text or json, got %q", o.output)
+		return o, fmt.Errorf("--output must be text, json or markdown, got %q", o.output)
 	}
 	if o.all && len(o.targets) > 0 {
 		return o, errors.New("--all-namespaces scans the whole cluster; drop the targets or use -n")
