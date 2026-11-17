@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -21,9 +23,52 @@ import (
 )
 
 var (
-	version = "dev" // set by goreleaser
+	// set by goreleaser; `go install` builds fill them from build info instead
+	version = ""
+	commit  = ""
+	date    = ""
 	now     = time.Now
 )
+
+// versionString reports what was built and from where, so a bug report can
+// say exactly which binary misdiagnosed a pod.
+func versionString() string {
+	v, c, d, dirty := version, commit, date, false
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		if v == "" && bi.Main.Version != "" && bi.Main.Version != "(devel)" {
+			v = bi.Main.Version
+		}
+		for _, s := range bi.Settings {
+			switch {
+			case s.Key == "vcs.revision" && c == "":
+				c = s.Value
+			case s.Key == "vcs.time" && d == "":
+				d = s.Value
+			case s.Key == "vcs.modified" && s.Value == "true":
+				dirty = commit == ""
+			}
+		}
+	}
+	if v == "" {
+		v = "dev"
+	}
+	out := "kubectl-why " + v
+	var extra []string
+	if c != "" {
+		if len(c) > 12 {
+			c = c[:12]
+		}
+		if dirty {
+			c += "-dirty"
+		}
+		extra = append(extra, "commit "+c)
+	}
+	if d != "" {
+		extra = append(extra, "built "+d)
+	}
+	extra = append(extra, runtime.Version(), runtime.GOOS+"/"+runtime.GOARCH)
+	return out + " (" + strings.Join(extra, ", ") + ")"
+}
 
 const usage = `kubectl why: explain why a pod or deployment is unhealthy
 
@@ -64,7 +109,7 @@ func run(args []string, stdout, stderr io.Writer, r kube.Runner) int {
 		return 0
 	}
 	if errors.Is(err, errVersion) {
-		fmt.Fprintln(stdout, "kubectl-why", version)
+		fmt.Fprintln(stdout, versionString())
 		return 0
 	}
 	if err != nil {

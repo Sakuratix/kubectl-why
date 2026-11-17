@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -183,6 +184,20 @@ func TestAllNamespacesAsksKubectlForEverything(t *testing.T) {
 	for _, c := range f.calls {
 		if !strings.Contains(c, "--all-namespaces") {
 			t.Errorf("kubectl %s: missing --all-namespaces", c)
+		}
+	}
+}
+
+func TestVersion(t *testing.T) {
+	version, commit, date = "v1.2.3", "abcdef1", "2026-11-17T06:00:00Z"
+	defer func() { version, commit, date = "", "", "" }()
+	var out bytes.Buffer
+	if code := run([]string{"--version"}, &out, &bytes.Buffer{}, nil); code != 0 {
+		t.Fatalf("exit %d", code)
+	}
+	for _, want := range []string{"kubectl-why v1.2.3 (", "commit abcdef1", "built 2026-11-17T06:00:00Z", runtime.GOOS + "/" + runtime.GOARCH} {
+		if !strings.Contains(out.String(), want) {
+			t.Errorf("version output %q lacks %q", out.String(), want)
 		}
 	}
 }
