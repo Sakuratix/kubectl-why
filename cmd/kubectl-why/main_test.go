@@ -70,6 +70,7 @@ func TestGolden(t *testing.T) {
 		{"failed-mount", []string{"pod/postgres-0"}, 1, ""},
 		{"init-failing", []string{"pod/api-7f9c6-m3k8j"}, 1, ""},
 		{"deployment", []string{"deploy/api", "-n", "shop"}, 1, ""},
+		{"deploy-podsecurity", []string{"deploy/api", "-n", "shop"}, 1, ""},
 		{"namespace", []string{"-n", "shop"}, 1, ""},
 		{"all-namespaces", []string{"-A"}, 1, ""},
 		{"deployment", []string{"deploy/api", "-n", "shop", "-o", "markdown"}, 1, "want.md"},

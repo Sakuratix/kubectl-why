@@ -1,0 +1,40 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "api",
+    "namespace": "shop",
+    "creationTimestamp": "2026-11-02T10:00:00Z"
+  },
+  "spec": {
+    "replicas": 3,
+    "selector": {
+      "matchLabels": {
+        "app": "api"
+      }
+    }
+  },
+  "status": {
+    "replicas": 0,
+    "updatedReplicas": 0,
+    "readyReplicas": 0,
+    "availableReplicas": 0,
+    "unavailableReplicas": 3,
+    "conditions": [
+      {
+        "type": "Available",
+        "status": "False",
+        "reason": "MinimumReplicasUnavailable",
+        "message": "Deployment does not have minimum availability.",
+        "lastTransitionTime": "2026-11-14T09:48:00Z"
+      },
+      {
+        "type": "ReplicaFailure",
+        "status": "True",
+        "reason": "FailedCreate",
+        "message": "pods \"api-5c8d7b-\" is forbidden: violates PodSecurity \"restricted:latest\": allowPrivilegeEscalation != false (container \"app\" must set securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container \"app\" must set securityContext.capabilities.drop=[\"ALL\"]), runAsNonRoot != true (pod or container \"app\" must set securityContext.runAsNonRoot=true)",
+        "lastTransitionTime": "2026-11-14T09:50:00Z"
+      }
+    ]
+  }
+}

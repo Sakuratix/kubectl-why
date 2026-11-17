@@ -1,0 +1,9 @@
+deployment/api  Unavailable · ready 0/3 · age 12d
+  ✗ Pod Security Admission rejects the pod spec
+    pods "api-5c8d7b-" is forbidden: violates PodSecurity "restricted:latest":
+    allowPrivilegeEscalation != false (container "app" must set
+    securityContext.allowPrivilegeEscalation=false), unrestricted capabilities (container "app" must
+    set securityContext.capabilities.drop=["ALL"]), runAsNonRoot != true (pod or container "app"
+    must set securityContext.runAsNonRoot=true)
+    → The message lists each violation. The usual fixes for the restricted level: runAsNonRoot: true, allowPrivilegeEscalation: false, capabilities.drop: [ALL], seccompProfile.type: RuntimeDefault.
+    → See which level the namespace enforces: `kubectl get ns shop --show-labels` (pod-security.kubernetes.io/enforce).

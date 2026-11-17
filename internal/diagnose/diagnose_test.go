@@ -112,3 +112,20 @@ func TestStartProblem(t *testing.T) {
 		}
 	}
 }
+
+func TestReplicaFailure(t *testing.T) {
+	cases := map[string]string{
+		`pods "x-" is forbidden: exceeded quota: compute, requested: limits.cpu=2`:                          "ResourceQuota blocks new pods",
+		`pods "x-" is forbidden: violates PodSecurity "restricted:latest": runAsNonRoot != true`:            "Pod Security Admission rejects the pod spec",
+		`pods "x-" is forbidden: error looking up service account shop/api: serviceaccount "api" not found`: "The ServiceAccount it runs as doesn't exist",
+		`admission webhook "validate.kyverno.svc-fail" denied the request: require-labels`:                  "An admission webhook denied the pod",
+		`pods "x-" is forbidden: maximum memory usage per Container is 1Gi, but limit is 2Gi`:               "A LimitRange rejects the pod's resources",
+		`something new`: "ReplicaSet can't create pods (FailedCreate)",
+	}
+	for msg, want := range cases {
+		f := replicaFailure(kube.Condition{Type: "ReplicaFailure", Status: "True", Reason: "FailedCreate", Message: msg}, "shop")
+		if f.Title != want {
+			t.Errorf("%q\n got  %q\n want %q", msg, f.Title, want)
+		}
+	}
+}

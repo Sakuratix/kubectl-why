@@ -36,12 +36,7 @@ func Deployment(d kube.Deployment, pods []Report, now time.Time) Report {
 				},
 			})
 		case c.Type == "ReplicaFailure" && c.Status == "True":
-			f := Finding{Severity: Crit, Title: "ReplicaSet can't create pods (" + c.Reason + ")", Detail: c.Message}
-			if strings.Contains(strings.ToLower(c.Message), "exceeded quota") {
-				f.Title = "ResourceQuota blocks new pods"
-				f.Hints = []string{"Check `kubectl describe resourcequota -n " + orDash(d.Metadata.Namespace) + "`: raise the quota or lower requests/limits."}
-			}
-			r.Findings = append(r.Findings, f)
+			r.Findings = append(r.Findings, replicaFailure(c, d.Metadata.Namespace))
 		case c.Type == "Available" && c.Status == "False":
 			if r.Status == "Available" {
 				r.Status = "Unavailable"
@@ -72,4 +67,37 @@ func Deployment(d kube.Deployment, pods []Report, now time.Time) Report {
 		r.Findings = append(r.Findings, Finding{Severity: OK, Title: fmt.Sprintf("%d pod(s) healthy, not shown", healthy)})
 	}
 	return r
+}
+
+// replicaFailure explains why the API server refused to create pods. The
+// pods never exist, so there is nothing below the deployment to look at:
+// everything has to come from the condition message.
+func replicaFailure(c kube.Condition, ns string) Finding {
+	f := Finding{Severity: Crit, Title: "ReplicaSet can't create pods (" + c.Reason + ")", Detail: c.Message}
+	msg := strings.ToLower(c.Message)
+	switch {
+	case strings.Contains(msg, "exceeded quota"):
+		f.Title = "ResourceQuota blocks new pods"
+		f.Hints = []string{"Check `kubectl describe resourcequota -n " + orDash(ns) + "`: raise the quota or lower requests/limits."}
+	case strings.Contains(msg, "violates podsecurity"):
+		f.Title = "Pod Security Admission rejects the pod spec"
+		f.Hints = []string{
+			"The message lists each violation. The usual fixes for the restricted level: runAsNonRoot: true, " +
+				"allowPrivilegeEscalation: false, capabilities.drop: [ALL], seccompProfile.type: RuntimeDefault.",
+			"See which level the namespace enforces: `kubectl get ns " + orDash(ns) + " --show-labels` (pod-security.kubernetes.io/enforce).",
+		}
+	case strings.Contains(msg, "serviceaccount") && strings.Contains(msg, "not found"):
+		f.Title = "The ServiceAccount it runs as doesn't exist"
+		f.Hints = []string{"Create it, or fix serviceAccountName: `kubectl get serviceaccount -n " + orDash(ns) + "`."}
+	case strings.Contains(msg, "admission webhook") && strings.Contains(msg, "denied"):
+		f.Title = "An admission webhook denied the pod"
+		f.Hints = []string{
+			"A policy engine (Kyverno, Gatekeeper, ...) rejected it; the message names the webhook and usually the rule.",
+			"List them: `kubectl get validatingwebhookconfigurations`.",
+		}
+	case strings.Contains(msg, "limitrange") || strings.Contains(msg, "maximum cpu") || strings.Contains(msg, "maximum memory"):
+		f.Title = "A LimitRange rejects the pod's resources"
+		f.Hints = []string{"Check `kubectl describe limitrange -n " + orDash(ns) + "` and keep requests/limits inside it."}
+	}
+	return f
 }
