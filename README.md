@@ -28,6 +28,8 @@ sudo install kubectl-why /usr/local/bin/
 
 Or from source: `go install github.com/Sakuratix/kubectl-why/cmd/kubectl-why@latest`
 
+**Tab completion.** kubectl 1.26+ completes plugin arguments through a `kubectl_complete-why` executable in your `PATH`. It ships in every release archive (or take it from the repo root): pods, `deploy/` names in the right namespace, namespaces after `-n`, formats after `-o`.
+
 ## Usage
 
 ```sh

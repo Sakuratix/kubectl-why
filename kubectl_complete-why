@@ -1,0 +1,38 @@
+#!/bin/sh
+# Shell completion for `kubectl why` (kubectl >= 1.26 runs kubectl_complete-<plugin>
+# from PATH). kubectl passes the words after `why`, the last one being the word
+# under the cursor (possibly empty). We print candidates, one per line, then the
+# cobra directive ":4" (no file completion).
+set -u
+
+ns="" prev="" cur=""
+for word in "$@"; do
+	case "$cur" in -n | --namespace) ns=$word ;; esac
+	case "$word" in --namespace=*) ns=${word#--namespace=} ;; esac
+	prev=$cur cur=$word
+done
+
+k() { if [ -n "$ns" ]; then kubectl "$@" -n "$ns"; else kubectl "$@"; fi 2>/dev/null; }
+
+case "$prev" in
+-n | --namespace)
+	kubectl get namespaces -o name 2>/dev/null | sed 's#^namespace/##'
+	;;
+-o | --output)
+	printf '%s\n' text json markdown
+	;;
+--context)
+	kubectl config get-contexts -o name 2>/dev/null
+	;;
+*)
+	case "$cur" in
+	-*) printf '%s\n' -n --namespace -A --all-namespaces --context --kubeconfig -o --output --no-color --version ;;
+	deploy/* | deployment/*) k get deployments -o name | sed 's#^deployment.apps/#deploy/#' ;;
+	*)
+		k get pods -o name
+		echo deploy/
+		;;
+	esac
+	;;
+esac
+echo ":4"

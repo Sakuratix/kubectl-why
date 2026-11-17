@@ -20,6 +20,8 @@ jobs:
         run: test -z "$(gofmt -l . | tee /dev/stderr)"
       - name: vet
         run: go vet ./...
+      - name: shellcheck
+        run: shellcheck kubectl_complete-why
       - name: staticcheck
         run: go run honnef.co/go/tools/cmd/staticcheck@2025.1.1 ./...
       - name: unit and golden tests
@@ -52,6 +54,12 @@ jobs:
           sudo install kubectl-why /usr/local/bin/
           kubectl plugin list | grep kubectl-why
           kubectl why pod/healthy -n why-e2e --no-color
+      - name: tab completion lists real objects
+        run: |
+          sudo install kubectl_complete-why /usr/local/bin/
+          pods=$(kubectl_complete-why -n why-e2e '') && echo "$pods"
+          grep -qx 'pod/healthy' <<<"$pods"
+          formats=$(kubectl_complete-why -o '') && grep -qx markdown <<<"$formats"
       - name: cluster-wide report in the job summary
         run: |
           # the e2e namespace is full of broken pods on purpose, so exit 1 is expected
