@@ -1,4 +1,4 @@
-.PHONY: build test golden lint e2e demo
+.PHONY: build test golden lint e2e demo fuzz
 build:
 	go build -o kubectl-why ./cmd/kubectl-why
 test:
@@ -12,3 +12,6 @@ e2e: build ## needs a throwaway cluster, e.g. `kind create cluster`
 demo: ## regenerate docs/demo.svg from the deployment fixture
 	go test ./cmd/kubectl-why -run 'TestGolden|TestDemo' -update
 	python3 hack/ansi2svg.py "kubectl why deploy/api -n shop" < docs/demo.ansi > docs/demo.svg
+fuzz: ## longer local fuzzing run
+	go test -run '^$$' -fuzz '^FuzzPod$$' -fuzztime 5m ./internal/diagnose
+	go test -run '^$$' -fuzz '^FuzzMarkdownEscape$$' -fuzztime 2m ./internal/render

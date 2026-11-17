@@ -26,6 +26,12 @@ jobs:
         run: go test -race -coverprofile=cover.out ./...
       - name: coverage
         run: go tool cover -func=cover.out | tail -1 | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: fuzz (short)
+        # seeds come from testdata/; a crasher found here is saved under
+        # testdata/fuzz/ and becomes a regular test case once committed
+        run: |
+          go test -run '^$' -fuzz '^FuzzPod$' -fuzztime 30s ./internal/diagnose
+          go test -run '^$' -fuzz '^FuzzMarkdownEscape$' -fuzztime 20s ./internal/render
 
   e2e:
     runs-on: ubuntu-latest
