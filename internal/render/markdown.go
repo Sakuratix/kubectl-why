@@ -101,16 +101,24 @@ func markdown(w io.Writer, r diagnose.Report, h string) {
 
 // mdEscape keeps cluster-supplied text (event messages, termination
 // messages) from turning into HTML or breaking the layout. Text inside
-// backticks is left alone so commands stay copyable.
+// matched backticks is left alone so commands stay copyable; an unmatched
+// backtick is escaped, otherwise everything after it would be passed
+// through raw.
 func mdEscape(s string) string {
+	ticks := strings.Count(s, "`")
 	var b strings.Builder
-	code := false
+	code, seen := false, 0
 	for _, r := range s {
 		switch {
 		case r == '`':
+			seen++
+			if seen == ticks && ticks%2 == 1 {
+				b.WriteString("\\`")
+				continue
+			}
 			code = !code
 			b.WriteRune(r)
-		case code:
+		case code && r != '\n':
 			b.WriteRune(r)
 		case r == '<':
 			b.WriteString("&lt;")
