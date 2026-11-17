@@ -57,6 +57,7 @@ func TestGolden(t *testing.T) {
 		{"crashloop", []string{"worker-5d8b7-q8vtl"}, 1, ""},
 		{"exec-format", []string{"pod/worker-5d8b7-q8vtl"}, 1, ""},
 		{"start-error", []string{"pod/worker-5d8b7-q8vtl"}, 1, ""},
+		{"sigkill", []string{"pod/worker-5d8b7-q8vtl"}, 1, ""},
 		{"crash-now", []string{"pod/report-6b4d9-7wq2c"}, 1, ""},
 		{"liveness", []string{"pod", "api-7f9c6-l9d2s"}, 1, ""},
 		{"image-notfound", []string{"pod/api-7f9c6-pp4mz"}, 1, ""},

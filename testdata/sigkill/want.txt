@@ -1,0 +1,6 @@
+pod/worker-5d8b7-q8vtl  CrashLoopBackOff · ready 0/1 · restarts 3 · age 1h · node worker-2
+  ✗ [worker] Crash loop: restarted 3 times
+    Exit code 137: killed with SIGKILL, but not for memory and not by a liveness probe.
+    · last exit: Error, exit code 137, 2m ago
+    → If this happened on a rollout or scale-down, the app ignored SIGTERM for the whole grace period (10s) and was killed. Handle SIGTERM, and make sure PID 1 gets it: exec-form ENTRYPOINT, `exec` in shell wrappers, or tini.
+    → The reason is in the logs of the previous run: `kubectl logs worker-5d8b7-q8vtl -c worker --previous`

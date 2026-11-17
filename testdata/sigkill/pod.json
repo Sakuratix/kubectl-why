@@ -1,0 +1,67 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "worker-5d8b7-q8vtl",
+    "namespace": "shop",
+    "creationTimestamp": "2026-11-14T08:25:00Z",
+    "labels": {
+      "app": "worker"
+    },
+    "ownerReferences": [
+      {
+        "kind": "ReplicaSet",
+        "name": "worker-5d8b7"
+      }
+    ]
+  },
+  "spec": {
+    "nodeName": "worker-2",
+    "containers": [
+      {
+        "name": "worker",
+        "image": "ghcr.io/acme/worker:2.0.0",
+        "resources": {}
+      }
+    ],
+    "terminationGracePeriodSeconds": 10
+  },
+  "status": {
+    "phase": "Running",
+    "startTime": "2026-11-14T08:25:00Z",
+    "conditions": [
+      {
+        "type": "PodScheduled",
+        "status": "True",
+        "lastTransitionTime": "2026-11-14T08:25:00Z"
+      },
+      {
+        "type": "Ready",
+        "status": "False",
+        "lastTransitionTime": "2026-11-14T08:25:00Z"
+      }
+    ],
+    "containerStatuses": [
+      {
+        "name": "worker",
+        "image": "ghcr.io/acme/worker:2.0.0",
+        "ready": false,
+        "restartCount": 3,
+        "state": {
+          "waiting": {
+            "reason": "CrashLoopBackOff"
+          }
+        },
+        "lastState": {
+          "terminated": {
+            "exitCode": 137,
+            "reason": "Error",
+            "startedAt": "2026-11-14T09:56:00Z",
+            "finishedAt": "2026-11-14T09:58:00Z",
+            "message": ""
+          }
+        }
+      }
+    ]
+  }
+}

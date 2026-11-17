@@ -30,10 +30,12 @@ type Pod struct {
 }
 
 type PodSpec struct {
-	NodeName       string      `json:"nodeName,omitempty"`
-	InitContainers []Container `json:"initContainers,omitempty"`
-	Containers     []Container `json:"containers"`
-	Volumes        []Volume    `json:"volumes,omitempty"`
+	NodeName string `json:"nodeName,omitempty"`
+	// TerminationGracePeriodSeconds is how long SIGTERM gets before SIGKILL (default 30).
+	TerminationGracePeriodSeconds *int        `json:"terminationGracePeriodSeconds,omitempty"`
+	InitContainers                []Container `json:"initContainers,omitempty"`
+	Containers                    []Container `json:"containers"`
+	Volumes                       []Volume    `json:"volumes,omitempty"`
 }
 
 type Container struct {

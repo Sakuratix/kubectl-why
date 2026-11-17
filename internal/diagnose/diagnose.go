@@ -467,8 +467,24 @@ func (d *podDiag) crash(cs kube.ContainerStatus, label string, spec kube.Contain
 		if t.ExitCode == 127 || t.ExitCode == 126 {
 			f.Hints = append([]string{"Check command/args and that the binary exists in image " + cs.Image + "."}, f.Hints...)
 		}
+		if t.ExitCode == 137 {
+			// Not OOMKilled and no failing liveness probe: the usual source is
+			// the kubelet itself, after SIGTERM went unanswered.
+			f.Detail = "Exit code 137: killed with SIGKILL, but not for memory and not by a liveness probe."
+			f.Hints = append([]string{fmt.Sprintf(
+				"If this happened on a rollout or scale-down, the app ignored SIGTERM for the whole grace period (%ds) and was killed. "+
+					"Handle SIGTERM, and make sure PID 1 gets it: exec-form ENTRYPOINT, `exec` in shell wrappers, or tini.",
+				grace(d.p))}, f.Hints...)
+		}
 	}
 	d.add(f)
+}
+
+func grace(p kube.Pod) int {
+	if g := p.Spec.TerminationGracePeriodSeconds; g != nil {
+		return *g
+	}
+	return 30
 }
 
 // runtimeErr pulls the useful part out of an OCI runtime error such as
