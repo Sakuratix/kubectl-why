@@ -40,9 +40,33 @@ func (k Kubectl) Run(ctx context.Context, args ...string) ([]byte, error) {
 		if errors.As(err, &ee) {
 			return nil, fmt.Errorf("kubectl not found in PATH: %w", err)
 		}
-		return nil, errors.New(msg)
+		return nil, Explain(msg)
 	}
 	return out.Bytes(), nil
+}
+
+// Explain turns kubectl's most common failures into a message that says
+// what to do. Anything unrecognised is passed through unchanged.
+func Explain(msg string) error {
+	m := strings.ToLower(msg)
+	hint := ""
+	switch {
+	case strings.Contains(m, "connection to the server") && strings.Contains(m, "was refused"),
+		strings.Contains(m, "unable to connect to the server"),
+		strings.Contains(m, "no such host"):
+		hint = "can't reach the cluster API. Check the context (`kubectl config current-context`), VPN, and that the cluster is up"
+	case strings.Contains(m, "you must be logged in"), strings.Contains(m, "unauthorized"):
+		hint = "the cluster rejected your credentials. They have probably expired: log in again with your provider's CLI"
+	case strings.Contains(m, "forbidden") && strings.Contains(m, "cannot"):
+		hint = "your user lacks RBAC permissions for this. kubectl-why needs get/list on pods, events and deployments: " +
+			"`kubectl auth can-i list events`"
+	case strings.Contains(m, "(notfound)"):
+		hint = "no such object in this namespace. Add -n NAMESPACE, or run `kubectl why` without arguments to scan the namespace"
+	}
+	if hint == "" {
+		return errors.New(msg)
+	}
+	return fmt.Errorf("%s\n  hint: %s", msg, hint)
 }
 
 // Client fetches typed objects through a Runner.
