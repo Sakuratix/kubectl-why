@@ -98,3 +98,17 @@ func TestDeploymentScaledToZero(t *testing.T) {
 		t.Errorf("unexpected: %+v", r.Findings)
 	}
 }
+
+func TestStartProblem(t *testing.T) {
+	cases := map[string]string{
+		`failed to create containerd task: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: "gunicorn": executable file not found in $PATH: unknown`: `"gunicorn": executable file not found in $PATH`,
+		`OCI runtime create failed: runc create failed: unable to start container process: error during container init: open /dev/null: permission denied: unknown`:                                                     `error during container init: open /dev/null: permission denied`,
+		"":                           "the runtime gave no reason",
+		"something odd\nsecond line": "something odd",
+	}
+	for in, want := range cases {
+		if got := startProblem(in); got != want {
+			t.Errorf("startProblem(%q) = %q, want %q", in, got, want)
+		}
+	}
+}

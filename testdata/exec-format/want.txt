@@ -1,0 +1,7 @@
+pod/worker-5d8b7-q8vtl  CrashLoopBackOff · ready 0/1 · restarts 5 · age 1h · node arm-1
+  ✗ [worker] Wrong CPU architecture: the image can't run on this node
+    exec format error: ghcr.io/acme/worker:2.1.0 has no build for the architecture of node arm-1.
+    Usually an amd64-only image on an arm64 node (Graviton, Ampere, Raspberry Pi) or the reverse.
+    · last exit: StartError, exit code 128, 2m ago
+    → See which platforms the image has: `docker buildx imagetools inspect ghcr.io/acme/worker:2.1.0`.
+    → Publish a multi-arch image (`docker buildx build --platform linux/amd64,linux/arm64`), or pin the pod with nodeSelector `kubernetes.io/arch`.

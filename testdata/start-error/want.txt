@@ -1,0 +1,5 @@
+pod/worker-5d8b7-q8vtl  CrashLoopBackOff · ready 0/1 · restarts 5 · age 1h · node worker-2
+  ✗ [worker] Container never started: "gunicorn": executable file not found in $PATH
+    · last exit: StartError, exit code 128, 2m ago
+    → The runtime couldn't exec the entrypoint, so there are no logs. Compare command/args in the pod spec with the image: `docker inspect --format '{{.Config.Entrypoint}} {{.Config.Cmd}}' ghcr.io/acme/worker:2.1.0`.
+    → A shell script entrypoint needs a shebang line and the executable bit (`chmod +x` in the Dockerfile).

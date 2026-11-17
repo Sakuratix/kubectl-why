@@ -63,6 +63,7 @@ Event and termination messages are escaped, so a crashing app can't inject HTML 
 |---|---|
 | `OOMKilled` | the memory limit it hit, and how to see real usage |
 | `CrashLoopBackOff` | exit code in words (1, 126, 127, 137, 139, 143...), the termination message, the `logs --previous` command |
+| Container never starts (`StartError`) | the missing binary or init error pulled out of the OCI runtime message; `exec format error` is named for what it is: an image built for another CPU architecture |
 | Killed by liveness probe | the probe spec, the last failure, startupProbe advice |
 | Readiness probe failing | why: connection refused / 5xx / 404 / timeout, each with its own fix |
 | `ImagePullBackOff` | tag doesn't exist vs. private registry (imagePullSecrets) vs. registry unreachable vs. Docker Hub rate limit |

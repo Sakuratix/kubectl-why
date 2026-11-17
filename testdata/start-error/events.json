@@ -1,0 +1,42 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "metadata": {
+        "name": "worker-5d8b7-q8vtl.18backoff",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "worker-5d8b7-q8vtl",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "Failed",
+      "message": "Error: failed to create containerd task: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: \"gunicorn\": executable file not found in $PATH: unknown",
+      "count": 54,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    },
+    {
+      "metadata": {
+        "name": "worker-5d8b7-q8vtl.18backoff",
+        "namespace": "shop",
+        "creationTimestamp": "2026-11-14T09:59:00Z"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "name": "worker-5d8b7-q8vtl",
+        "namespace": "shop"
+      },
+      "type": "Warning",
+      "reason": "BackOff",
+      "message": "Back-off restarting failed container worker",
+      "count": 54,
+      "firstTimestamp": "2026-11-14T09:54:00Z",
+      "lastTimestamp": "2026-11-14T09:59:00Z"
+    }
+  ]
+}

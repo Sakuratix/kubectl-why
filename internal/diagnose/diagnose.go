@@ -430,6 +430,24 @@ func (d *podDiag) crash(cs kube.ContainerStatus, label string, spec kube.Contain
 			"Raise resources.limits.memory, or find what grows: heap size flags (-Xmx, GOMEMLIMIT, Node --max-old-space-size) must fit under the limit.",
 			"Watch usage before the next kill: `kubectl top pod " + d.p.Metadata.Name + " --containers`.",
 		}
+	case strings.Contains(t.Message, "exec format error") || d.lastEventMatching("Failed", "exec format error") != nil:
+		d.markUsed("Failed")
+		f.Title = "Wrong CPU architecture: the image can't run on this node"
+		f.Evidence = withoutTermination(f.Evidence)
+		f.Detail = fmt.Sprintf("exec format error: %s has no build for the architecture of node %s. "+
+			"Usually an amd64-only image on an arm64 node (Graviton, Ampere, Raspberry Pi) or the reverse.", cs.Image, orDash(d.p.Spec.NodeName))
+		f.Hints = []string{
+			"See which platforms the image has: `docker buildx imagetools inspect " + cs.Image + "`.",
+			"Publish a multi-arch image (`docker buildx build --platform linux/amd64,linux/arm64`), or pin the pod with nodeSelector `kubernetes.io/arch`.",
+		}
+	case t.Reason == "StartError" || t.Reason == "ContainerCannotRun":
+		d.markUsed("Failed")
+		f.Title = "Container never started: " + startProblem(t.Message)
+		f.Evidence = withoutTermination(f.Evidence)
+		f.Hints = []string{
+			"The runtime couldn't exec the entrypoint, so there are no logs. Compare command/args in the pod spec with the image: `docker inspect --format '{{.Config.Entrypoint}} {{.Config.Cmd}}' " + cs.Image + "`.",
+			"A shell script entrypoint needs a shebang line and the executable bit (`chmod +x` in the Dockerfile).",
+		}
 	case live != nil && (t.ExitCode == 137 || t.ExitCode == 143 || t.ExitCode == 2):
 		d.markUsed("Unhealthy", "Killing")
 		f.Title = "Killed by its liveness probe"
@@ -451,6 +469,33 @@ func (d *podDiag) crash(cs kube.ContainerStatus, label string, spec kube.Contain
 		}
 	}
 	d.add(f)
+}
+
+// runtimeErr pulls the useful part out of an OCI runtime error such as
+// `failed to create containerd task: ... exec: "gunicorn": executable file not found in $PATH: unknown`.
+var runtimeErr = regexp.MustCompile(`(?:.*exec: |.*unable to start container process: )(.+?)(?:: unknown)?$`)
+
+func startProblem(msg string) string {
+	msg = strings.TrimSpace(firstLine(msg))
+	if m := runtimeErr.FindStringSubmatch(msg); m != nil {
+		return m[1]
+	}
+	if msg == "" {
+		return "the runtime gave no reason"
+	}
+	return msg
+}
+
+// withoutTermination drops the raw termination message when a finding
+// already explains it in better words.
+func withoutTermination(ev []string) []string {
+	out := ev[:0:0]
+	for _, e := range ev {
+		if !strings.HasPrefix(e, "termination message: ") {
+			out = append(out, e)
+		}
+	}
+	return out
 }
 
 func (d *podDiag) notReady(cs kube.ContainerStatus, label string, spec kube.Container) {

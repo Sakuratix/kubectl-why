@@ -1,0 +1,66 @@
+{
+  "apiVersion": "v1",
+  "kind": "Pod",
+  "metadata": {
+    "name": "worker-5d8b7-q8vtl",
+    "namespace": "shop",
+    "creationTimestamp": "2026-11-14T08:25:00Z",
+    "labels": {
+      "app": "worker"
+    },
+    "ownerReferences": [
+      {
+        "kind": "ReplicaSet",
+        "name": "worker-5d8b7"
+      }
+    ]
+  },
+  "spec": {
+    "nodeName": "arm-1",
+    "containers": [
+      {
+        "name": "worker",
+        "image": "ghcr.io/acme/worker:2.1.0",
+        "resources": {}
+      }
+    ]
+  },
+  "status": {
+    "phase": "Running",
+    "startTime": "2026-11-14T08:25:00Z",
+    "conditions": [
+      {
+        "type": "PodScheduled",
+        "status": "True",
+        "lastTransitionTime": "2026-11-14T08:25:00Z"
+      },
+      {
+        "type": "Ready",
+        "status": "False",
+        "lastTransitionTime": "2026-11-14T08:25:00Z"
+      }
+    ],
+    "containerStatuses": [
+      {
+        "name": "worker",
+        "image": "ghcr.io/acme/worker:2.1.0",
+        "ready": false,
+        "restartCount": 5,
+        "state": {
+          "waiting": {
+            "reason": "CrashLoopBackOff"
+          }
+        },
+        "lastState": {
+          "terminated": {
+            "exitCode": 128,
+            "reason": "StartError",
+            "startedAt": "1970-01-01T00:00:00Z",
+            "finishedAt": "2026-11-14T09:58:00Z",
+            "message": "failed to create containerd task: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: \"/app/server\": exec format error: unknown"
+          }
+        }
+      }
+    ]
+  }
+}
